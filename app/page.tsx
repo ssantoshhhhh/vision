@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { signIn, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -69,9 +70,15 @@ const testimonials = [
 ]
 
 export default function LandingPage() {
-  const handleSignIn = () => {
-    // For now, just show an alert. In production, this would trigger GitHub OAuth
-    alert('GitHub OAuth integration would be configured here. Please set up your environment variables.')
+  const { data: session } = useSession()
+  
+  const handleSignIn = async () => {
+    try {
+      await signIn('github', { callbackUrl: '/dashboard' })
+    } catch (error) {
+      console.error('Sign in error:', error)
+      alert('Failed to sign in. Please check your environment variables.')
+    }
   }
 
   return (
@@ -89,10 +96,17 @@ export default function LandingPage() {
                 <p className="text-xs text-slate-500">AI-Powered Learning</p>
               </div>
             </div>
-            <Button onClick={handleSignIn} className="bg-emerald-600 hover:bg-emerald-700">
-              <GitBranch className="mr-2 h-4 w-4" />
-              Sign in with GitHub
-            </Button>
+            {session ? (
+              <Button onClick={() => window.location.href = '/dashboard'} className="bg-emerald-600 hover:bg-emerald-700">
+                <GitBranch className="mr-2 h-4 w-4" />
+                Go to Dashboard
+              </Button>
+            ) : (
+              <Button onClick={handleSignIn} className="bg-emerald-600 hover:bg-emerald-700">
+                <GitBranch className="mr-2 h-4 w-4" />
+                Sign in with GitHub
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -118,14 +132,25 @@ export default function LandingPage() {
               to accelerate your development skills like never before.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                onClick={handleSignIn}
-                className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-3"
-              >
-                <GitBranch className="mr-2 h-5 w-5" />
-                Start Learning Free
-              </Button>
+              {session ? (
+                <Button 
+                  size="lg" 
+                  onClick={() => window.location.href = '/dashboard'}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-3"
+                >
+                  <GitBranch className="mr-2 h-5 w-5" />
+                  Go to Dashboard
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  onClick={handleSignIn}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-3"
+                >
+                  <GitBranch className="mr-2 h-5 w-5" />
+                  Start Learning Free
+                </Button>
+              )}
               <Button size="lg" variant="outline" className="text-lg px-8 py-3">
                 Watch Demo
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -232,14 +257,25 @@ export default function LandingPage() {
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
               Join thousands of developers who are accelerating their growth with AI-powered mentorship
             </p>
-            <Button 
-              size="lg" 
-              onClick={handleSignIn}
-              className="bg-white text-emerald-600 hover:bg-slate-50 text-lg px-8 py-3"
-            >
-              <GitBranch className="mr-2 h-5 w-5" />
-              Get Started Now
-            </Button>
+            {session ? (
+              <Button 
+                size="lg" 
+                onClick={() => window.location.href = '/dashboard'}
+                className="bg-white text-emerald-600 hover:bg-slate-50 text-lg px-8 py-3"
+              >
+                <GitBranch className="mr-2 h-5 w-5" />
+                Go to Dashboard
+              </Button>
+            ) : (
+              <Button 
+                size="lg" 
+                onClick={handleSignIn}
+                className="bg-white text-emerald-600 hover:bg-slate-50 text-lg px-8 py-3"
+              >
+                <GitBranch className="mr-2 h-5 w-5" />
+                Get Started Now
+              </Button>
+            )}
           </motion.div>
         </div>
       </section>
